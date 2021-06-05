@@ -1,7 +1,8 @@
 package com.bennyplo.android_mooc_graphics_3d;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
     private MyView mMyView=null;//a custom view for drawing
