@@ -1,17 +1,15 @@
-package com.bennyplo.android_mooc_graphics_3d;
+package com.bennyplo.android_mooc_graphics_3d
 
-import android.os.Bundle;
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 
-import androidx.appcompat.app.AppCompatActivity;
-
-public class MainActivity extends AppCompatActivity {
-    private MyView mMyView=null;//a custom view for drawing
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+class MainActivity : AppCompatActivity() {
+    private var mMyView: MyView? = null //a custom view for drawing
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main);
-        getSupportActionBar().hide();//hide the title bar
-        mMyView=new MyView(this);
-        setContentView(mMyView);
+        supportActionBar!!.hide() //hide the title bar
+        mMyView = MyView(this)
+        setContentView(mMyView)
     }
 }
