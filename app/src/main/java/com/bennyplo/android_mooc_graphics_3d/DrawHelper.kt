@@ -7,17 +7,9 @@ import android.graphics.Paint
 object DrawHelper {
 
     private val redPaint : Paint = Paint(Paint.ANTI_ALIAS_FLAG) //paint object for drawing the lines
-    val cube_vertices : Array<Coordinate> //the vertices of a 3D cube
-
-
-    init {
-        //create the paint object
-        redPaint.style = Paint.Style.STROKE //Stroke
-        redPaint.color = Color.RED
-//        redPaint.color = Color.HSVToColor(arrayOf(60f, 0f, 1f).toFloatArray())
-        redPaint.strokeWidth = 2f
-        //create a 3D cube
-        cube_vertices = arrayOf(
+    private val bluePaint : Paint = Paint(Paint.ANTI_ALIAS_FLAG) //paint object for drawing the lines
+    val cube_vertices : Array<Coordinate> =
+        arrayOf(
             Coordinate(-1.0, -1.0, -1.0, 1.0),
             Coordinate(-1.0, -1.0, 1.0, 1.0),
             Coordinate(-1.0, 1.0, -1.0, 1.0),
@@ -26,8 +18,17 @@ object DrawHelper {
             Coordinate(1.0, -1.0, 1.0, 1.0),
             Coordinate(1.0, 1.0, -1.0, 1.0),
             Coordinate(1.0, 1.0, 1.0, 1.0),
-        )
+        ).scale(0.5, 0.5, 0.5) // scale to 1 by 1 by 1 cube
 
+
+    init {
+        //create the paint object
+        redPaint.style = Paint.Style.STROKE //Stroke
+        redPaint.color = Color.RED
+        redPaint.strokeWidth = 2f
+        bluePaint.style = Paint.Style.STROKE //Stroke
+        bluePaint.color = Color.BLUE
+        bluePaint.strokeWidth = 2f
     }
 
     private fun drawLinePairs(
@@ -48,6 +49,16 @@ object DrawHelper {
             vertices[end].x.toFloat(),
             vertices[end].y.toFloat(),
             paint
+        )
+    }
+
+    fun drawHeightLine(canvas: Canvas, y : Double, screenWidth: Double) {
+        canvas.drawLine(
+            0f,
+            y.toFloat(),
+            screenWidth.toFloat(),
+            y.toFloat(),
+            bluePaint
         )
     }
 
