@@ -1,8 +1,9 @@
 package com.bennyplo.android_mooc_graphics_3d
 
-import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Color
+import kotlin.math.cos
+import kotlin.math.sin
 
 object Robot {
 
@@ -39,9 +40,9 @@ object Robot {
     val leftLegX = - (bodyWidth / 2.0) + (limbWidth / 2.0)
     val rightLegX = + (bodyWidth / 2.0) - (limbWidth / 2.0)
 
-    val rightLegXOffset = bodyWidth - limbWidth
 
-    fun draw(canvas: Canvas, yRotationAngleInDegrees : Double) {
+    fun draw(canvas: Canvas, yRotationAngleInDegrees : Double,
+             legStretchAngleInDegrees: Double, moveLeftLeg : Boolean) {
 
         val cube = DrawHelper.cube_vertices
         
@@ -94,33 +95,62 @@ object Robot {
             .translate(rightArmX, handY, offsetZ - 50.0)
             .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
 
+        // Rotating the leg the leg go up and forward, calculate by how much
+        val upperLegRotationYOffset =
+            (cos(Math.toRadians(legStretchAngleInDegrees)) * upperLegHeight) - upperLegHeight
+        val upperLegRotationZOffset = - (sin(Math.toRadians(legStretchAngleInDegrees)) * upperLegHeight)
+
+
         val leftUpperLeg = cube
             .scale(limbWidth, upperLegHeight, limbWidth)
+            .conditional(moveLeftLeg) {
+                it.withOffset(limbWidth / 2.0, upperLegHeight / 2.0, -limbWidth / 2.0) {
+                    it.quaternionRotationFromEulerAngles(legStretchAngleInDegrees, -1.0, 0.0, 0.0)
+                }
+            }
             .translate(leftLegX, upperLegY, offsetZ)
             .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+
 
         val leftLowerLeg = cube
             .scale(limbWidth, lowerLegHeight, limbWidth)
             .translate(leftLegX, lowerLegY, offsetZ)
+            .conditional(moveLeftLeg) {
+                it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
+            }
             .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
 
         val leftFoot = cube
             .scale(limbWidth, footHeight, limbWidth + 100.0)
             .translate(leftLegX, footY, offsetZ - 50.0)
+            .conditional(moveLeftLeg) {
+                it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
+            }
             .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightUpperLeg = cube
             .scale(limbWidth, upperLegHeight, limbWidth)
+            .conditional(!moveLeftLeg) {
+                it.withOffset(limbWidth / 2.0, upperLegHeight / 2.0, -limbWidth / 2.0) {
+                    it.quaternionRotationFromEulerAngles(legStretchAngleInDegrees, -1.0, 0.0, 0.0)
+                }
+            }
             .translate(rightLegX, upperLegY, offsetZ)
             .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightLowerLeg = cube
             .scale(limbWidth, lowerLegHeight, limbWidth)
+            .conditional(!moveLeftLeg) {
+                it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
+            }
             .translate(rightLegX, lowerLegY, offsetZ)
             .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightFoot = cube
             .scale(limbWidth, footHeight, limbWidth + 100.0)
+            .conditional(!moveLeftLeg) {
+                it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
+            }
             .translate(rightLegX, footY, offsetZ - 50.0)
             .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
 

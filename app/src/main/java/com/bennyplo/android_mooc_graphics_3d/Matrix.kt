@@ -146,6 +146,13 @@ fun Array<Coordinate>.quarternionRotation(w : Double, x: Double, y: Double, z: D
     return Matrix.transformation(this, matrix)
 }
 
+fun Array<Coordinate>.withOffset(tx: Double, ty: Double, tz: Double, f : (Array<Coordinate>) -> Array<Coordinate>) : Array<Coordinate> {
+    return f(this.translate(tx, ty, tz)).translate(-tx, -ty, -tz)
+}
+fun Array<Coordinate>.conditional(condition : Boolean, f : (Array<Coordinate>) -> Array<Coordinate>) : Array<Coordinate> {
+    return if (condition) f(this) else this
+}
+
 fun Array<Coordinate>.quaternionRotationFromEulerAngles(angleInDegrees : Double, x: Double, y: Double, z: Double) : Array<Coordinate> {
     val angleInRadians = Math.toRadians(angleInDegrees)
     val sra2 = sin(angleInRadians / 2.0)
