@@ -1,13 +1,12 @@
-package com.bennyplo.android_mooc_graphics_3d
+package com.bennyplo.android_mooc_graphics_3d.robot
 
 import android.graphics.Canvas
 import android.graphics.Color
+import com.bennyplo.android_mooc_graphics_3d.*
 import kotlin.math.cos
 import kotlin.math.sin
 
 object Robot {
-
-
     val offsetZ = 0.0
     val offsetY = 150.0
     val headSize = 240.0
@@ -41,59 +40,64 @@ object Robot {
     val rightLegX = + (bodyWidth / 2.0) - (limbWidth / 2.0)
 
 
-    fun draw(canvas: Canvas, yRotationAngleInDegrees : Double,
-             legStretchAngleInDegrees: Double, moveLeftLeg : Boolean) {
+    fun draw(canvas: Canvas, 
+             viewAngleAnimationState: ViewAngleAnimationState, 
+             legAnimationState: LegAnimationState,
+             armAnimationState: ArmAnimationState) {
 
         val cube = DrawHelper.cube_vertices
+        val viewAngleInDegrees = viewAngleAnimationState.viewAngleInDegrees
+        val legStretchAngleInDegrees = legAnimationState.legAngleInDegrees
+        val stretchLeftLeg = legAnimationState.leftLeg
         
         val head = cube
             .scale(headSize, headSize, headSize)
             .translate(0.0, headY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
         val neck = cube
             .scale(neckHeight * 2.0, neckHeight, neckHeight * 2.0)
             .translate(0.0, neckY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val body = cube
             .scale(bodyWidth, bodyHeight, 120.0)
             .translate(0.0, bodyY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val waist = cube
             .scale(bodyWidth, waistHeight, 120.0)
             .translate(0.0, waistY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val leftUpperArm = cube
             .scale(limbWidth, upperArmHeight, limbWidth)
             .translate(leftArmX, upperArmY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val leftLowerArm = cube
             .scale(limbWidth, lowerArmHeight, limbWidth)
             .translate(leftArmX, lowerArmY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val leftHand = cube
             .scale(limbWidth, handHeight, limbWidth + 100.0)
             .translate(leftArmX, handY, offsetZ - 50.0)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightUpperArm = cube
             .scale(limbWidth, upperArmHeight, limbWidth)
             .translate(rightArmX, upperArmY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightLowerArm = cube
             .scale(limbWidth, lowerArmHeight, limbWidth)
             .translate(rightArmX, lowerArmY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightHand = cube
             .scale(limbWidth, handHeight, limbWidth + 100.0)
             .translate(rightArmX, handY, offsetZ - 50.0)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         // Rotating the leg the leg go up and forward, calculate by how much
         val upperLegRotationYOffset =
@@ -103,56 +107,56 @@ object Robot {
 
         val leftUpperLeg = cube
             .scale(limbWidth, upperLegHeight, limbWidth)
-            .conditional(moveLeftLeg) {
+            .conditional(stretchLeftLeg) {
                 it.withOffset(limbWidth / 2.0, upperLegHeight / 2.0, -limbWidth / 2.0) {
                     it.quaternionRotationFromEulerAngles(legStretchAngleInDegrees, -1.0, 0.0, 0.0)
                 }
             }
             .translate(leftLegX, upperLegY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
 
         val leftLowerLeg = cube
             .scale(limbWidth, lowerLegHeight, limbWidth)
-            .translate(leftLegX, lowerLegY, offsetZ)
-            .conditional(moveLeftLeg) {
+            .conditional(stretchLeftLeg) {
                 it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
             }
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .translate(leftLegX, lowerLegY, offsetZ)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val leftFoot = cube
             .scale(limbWidth, footHeight, limbWidth + 100.0)
-            .translate(leftLegX, footY, offsetZ - 50.0)
-            .conditional(moveLeftLeg) {
+            .conditional(stretchLeftLeg) {
                 it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
             }
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .translate(leftLegX, footY, offsetZ - 50.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightUpperLeg = cube
             .scale(limbWidth, upperLegHeight, limbWidth)
-            .conditional(!moveLeftLeg) {
+            .conditional(!stretchLeftLeg) {
                 it.withOffset(limbWidth / 2.0, upperLegHeight / 2.0, -limbWidth / 2.0) {
                     it.quaternionRotationFromEulerAngles(legStretchAngleInDegrees, -1.0, 0.0, 0.0)
                 }
             }
             .translate(rightLegX, upperLegY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightLowerLeg = cube
             .scale(limbWidth, lowerLegHeight, limbWidth)
-            .conditional(!moveLeftLeg) {
+            .conditional(!stretchLeftLeg) {
                 it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
             }
             .translate(rightLegX, lowerLegY, offsetZ)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         val rightFoot = cube
             .scale(limbWidth, footHeight, limbWidth + 100.0)
-            .conditional(!moveLeftLeg) {
+            .conditional(!stretchLeftLeg) {
                 it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
             }
             .translate(rightLegX, footY, offsetZ - 50.0)
-            .quaternionRotationFromEulerAngles(yRotationAngleInDegrees, 0.0, 1.0, 0.0)
+            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
 
         DrawHelper.drawCube(canvas, head.centerXOnScreen(), Color.BLUE)
         DrawHelper.drawCube(canvas, neck.centerXOnScreen(), Color.MAGENTA)
