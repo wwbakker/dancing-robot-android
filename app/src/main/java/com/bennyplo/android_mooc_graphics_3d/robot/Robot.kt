@@ -3,8 +3,8 @@ package com.bennyplo.android_mooc_graphics_3d.robot
 import android.graphics.Canvas
 import android.graphics.Color
 import com.bennyplo.android_mooc_graphics_3d.*
-import kotlin.math.cos
-import kotlin.math.sin
+import com.bennyplo.android_mooc_graphics_3d.robot.LimbType.*
+import com.bennyplo.android_mooc_graphics_3d.robot.transformations.*
 
 object Robot {
     val offsetZ = 0.0
@@ -39,143 +39,43 @@ object Robot {
     val leftLegX = - (bodyWidth / 2.0) + (limbWidth / 2.0)
     val rightLegX = + (bodyWidth / 2.0) - (limbWidth / 2.0)
 
+    val transformations = listOf(
+        ScaleTransformation(),
+        LegAnimation(),
+        MoveLimbToPositionInBodyTransformation(),
+        ViewAngleAnimation(),
+        CenterOnScreenTransformation()
+    )
 
-    fun draw(canvas: Canvas, 
-             viewAngleAnimationState: ViewAngleAnimationState, 
-             legAnimationState: LegAnimationState,
-             armAnimationState: ArmAnimationState) {
+    fun update() {
+        transformations.forEach { when(it) {
+            is Animation ->
+                it.update()
+        } }
+    }
 
+    fun draw(canvas: Canvas) {
         val cube = DrawHelper.cube_vertices
-        val viewAngleInDegrees = viewAngleAnimationState.viewAngleInDegrees
-        val legStretchAngleInDegrees = legAnimationState.legAngleInDegrees
-        val stretchLeftLeg = legAnimationState.leftLeg
-        
-        val head = cube
-            .scale(headSize, headSize, headSize)
-            .translate(0.0, headY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-        val neck = cube
-            .scale(neckHeight * 2.0, neckHeight, neckHeight * 2.0)
-            .translate(0.0, neckY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
+        values().map { limbType ->
+            Pair(transformations.fold(cube) { limb, transformation -> transformation.transform(limbType, limb) }, limbType)
+        }.forEach { limbAndLimbType ->
+            DrawHelper.drawCube(canvas, limbAndLimbType.first, limbToColor(limbAndLimbType.second))
+        }
+    }
 
-        val body = cube
-            .scale(bodyWidth, bodyHeight, 120.0)
-            .translate(0.0, bodyY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val waist = cube
-            .scale(bodyWidth, waistHeight, 120.0)
-            .translate(0.0, waistY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val leftUpperArm = cube
-            .scale(limbWidth, upperArmHeight, limbWidth)
-            .translate(leftArmX, upperArmY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val leftLowerArm = cube
-            .scale(limbWidth, lowerArmHeight, limbWidth)
-            .translate(leftArmX, lowerArmY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val leftHand = cube
-            .scale(limbWidth, handHeight, limbWidth + 100.0)
-            .translate(leftArmX, handY, offsetZ - 50.0)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val rightUpperArm = cube
-            .scale(limbWidth, upperArmHeight, limbWidth)
-            .translate(rightArmX, upperArmY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val rightLowerArm = cube
-            .scale(limbWidth, lowerArmHeight, limbWidth)
-            .translate(rightArmX, lowerArmY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val rightHand = cube
-            .scale(limbWidth, handHeight, limbWidth + 100.0)
-            .translate(rightArmX, handY, offsetZ - 50.0)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        // Rotating the leg the leg go up and forward, calculate by how much
-        val upperLegRotationYOffset =
-            (cos(Math.toRadians(legStretchAngleInDegrees)) * upperLegHeight) - upperLegHeight
-        val upperLegRotationZOffset = - (sin(Math.toRadians(legStretchAngleInDegrees)) * upperLegHeight)
-
-
-        val leftUpperLeg = cube
-            .scale(limbWidth, upperLegHeight, limbWidth)
-            .conditional(stretchLeftLeg) {
-                it.withOffset(limbWidth / 2.0, upperLegHeight / 2.0, -limbWidth / 2.0) {
-                    it.quaternionRotationFromEulerAngles(legStretchAngleInDegrees, -1.0, 0.0, 0.0)
-                }
-            }
-            .translate(leftLegX, upperLegY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-
-        val leftLowerLeg = cube
-            .scale(limbWidth, lowerLegHeight, limbWidth)
-            .conditional(stretchLeftLeg) {
-                it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
-            }
-            .translate(leftLegX, lowerLegY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val leftFoot = cube
-            .scale(limbWidth, footHeight, limbWidth + 100.0)
-            .conditional(stretchLeftLeg) {
-                it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
-            }
-            .translate(leftLegX, footY, offsetZ - 50.0)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val rightUpperLeg = cube
-            .scale(limbWidth, upperLegHeight, limbWidth)
-            .conditional(!stretchLeftLeg) {
-                it.withOffset(limbWidth / 2.0, upperLegHeight / 2.0, -limbWidth / 2.0) {
-                    it.quaternionRotationFromEulerAngles(legStretchAngleInDegrees, -1.0, 0.0, 0.0)
-                }
-            }
-            .translate(rightLegX, upperLegY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val rightLowerLeg = cube
-            .scale(limbWidth, lowerLegHeight, limbWidth)
-            .conditional(!stretchLeftLeg) {
-                it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
-            }
-            .translate(rightLegX, lowerLegY, offsetZ)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        val rightFoot = cube
-            .scale(limbWidth, footHeight, limbWidth + 100.0)
-            .conditional(!stretchLeftLeg) {
-                it.translate(0.0, upperLegRotationYOffset, upperLegRotationZOffset)
-            }
-            .translate(rightLegX, footY, offsetZ - 50.0)
-            .quaternionRotationFromEulerAngles(viewAngleInDegrees, 0.0, 1.0, 0.0)
-
-        DrawHelper.drawCube(canvas, head.centerXOnScreen(), Color.BLUE)
-        DrawHelper.drawCube(canvas, neck.centerXOnScreen(), Color.MAGENTA)
-        DrawHelper.drawCube(canvas, body.centerXOnScreen(), Color.RED)
-        DrawHelper.drawCube(canvas, waist.centerXOnScreen(), Color.MAGENTA)
-
-        DrawHelper.drawCube(canvas, leftUpperArm.centerXOnScreen(), Color.BLUE)
-        DrawHelper.drawCube(canvas, leftLowerArm.centerXOnScreen(), Color.GREEN)
-        DrawHelper.drawCube(canvas, leftHand.centerXOnScreen(), Color.CYAN)
-        DrawHelper.drawCube(canvas, rightUpperArm.centerXOnScreen(), Color.BLUE)
-        DrawHelper.drawCube(canvas, rightLowerArm.centerXOnScreen(), Color.GREEN)
-        DrawHelper.drawCube(canvas, rightHand.centerXOnScreen(), Color.CYAN)
-
-        DrawHelper.drawCube(canvas, leftUpperLeg.centerXOnScreen(), Color.BLUE)
-        DrawHelper.drawCube(canvas, leftLowerLeg.centerXOnScreen(), Color.GREEN)
-        DrawHelper.drawCube(canvas, leftFoot.centerXOnScreen(), Color.RED)
-        DrawHelper.drawCube(canvas, rightUpperLeg.centerXOnScreen(), Color.BLUE)
-        DrawHelper.drawCube(canvas, rightLowerLeg.centerXOnScreen(), Color.GREEN)
-        DrawHelper.drawCube(canvas, rightFoot.centerXOnScreen(), Color.RED)
+    private fun limbToColor(limbType: LimbType) : Int {
+        return when(limbType) {
+            Head -> Color.BLUE
+            Neck -> Color.MAGENTA
+            Body -> Color.RED
+            Waist -> Color.MAGENTA
+            UpperLeftArm, UpperRightArm -> Color.BLUE
+            LowerLeftArm, LowerRightArm -> Color.GREEN
+            LeftHand, RightHand -> Color.CYAN
+            UpperLeftLeg, UpperRightLeg ->  Color.BLUE
+            LowerLeftLeg, LowerRightLeg -> Color.GREEN
+            LeftFoot, RightFoot -> Color.RED
+        }
     }
 
 }

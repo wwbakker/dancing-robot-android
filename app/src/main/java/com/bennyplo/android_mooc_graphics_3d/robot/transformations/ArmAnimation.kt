@@ -1,8 +1,8 @@
-package com.bennyplo.android_mooc_graphics_3d.robot
+package com.bennyplo.android_mooc_graphics_3d.robot.transformations
 
-class ArmAnimationState(var armAngleInDegrees : Double = 0.0,
-                        var leftArm: Boolean = true,
-                        private var increaseArmAngle : Boolean = true) {
+class ArmAnimation(var armAngleInDegrees : Double = 0.0,
+                   var leftArm: Boolean = true,
+                   private var increaseArmAngle : Boolean = true) {
     fun update() {
         // ArmAngle
         when {

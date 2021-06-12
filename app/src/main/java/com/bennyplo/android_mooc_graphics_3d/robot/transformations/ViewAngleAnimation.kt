@@ -1,9 +1,11 @@
-package com.bennyplo.android_mooc_graphics_3d.robot
+package com.bennyplo.android_mooc_graphics_3d.robot.transformations
 
 import com.bennyplo.android_mooc_graphics_3d.Coordinate
 import com.bennyplo.android_mooc_graphics_3d.quaternionRotationFromEulerAngles
+import com.bennyplo.android_mooc_graphics_3d.robot.Animation
+import com.bennyplo.android_mooc_graphics_3d.robot.LimbType
 
-class ViewAngleAnimationState : Animation {
+class ViewAngleAnimation : Animation {
     var viewAngleInDegrees : Double = 0.0
     private var increaseViewAngle : Boolean = true
 
