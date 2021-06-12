@@ -1,5 +1,6 @@
 package com.bennyplo.android_mooc_graphics_3d
 
+import android.content.res.Resources
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -199,4 +200,10 @@ fun Array<Coordinate>.perspectiveProjectionDepthScale(near : Double, far : Doubl
     matrix[14] = -1.0
     matrix[15] = 0.0
     return Matrix.transformation(this, matrix)
+}
+
+private val screenCenterX = Resources.getSystem().displayMetrics.widthPixels / 2.0
+
+fun Array<Coordinate>.centerXOnScreen() : Array<Coordinate> {
+    return this.translate(screenCenterX, 0.0, 0.0)
 }

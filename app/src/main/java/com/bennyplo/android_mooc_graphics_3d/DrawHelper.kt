@@ -1,5 +1,6 @@
 package com.bennyplo.android_mooc_graphics_3d
 
+import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -62,18 +63,36 @@ object DrawHelper {
         )
     }
 
-    fun drawCube(canvas: Canvas, vertices: Array<Coordinate>) { //draw a cube on the screen
-        drawLinePairs(canvas, vertices, 0, 1, redPaint)
-        drawLinePairs(canvas, vertices, 1, 3, redPaint)
-        drawLinePairs(canvas, vertices, 3, 2, redPaint)
-        drawLinePairs(canvas, vertices, 2, 0, redPaint)
-        drawLinePairs(canvas, vertices, 4, 5, redPaint)
-        drawLinePairs(canvas, vertices, 5, 7, redPaint)
-        drawLinePairs(canvas, vertices, 7, 6, redPaint)
-        drawLinePairs(canvas, vertices, 6, 4, redPaint)
-        drawLinePairs(canvas, vertices, 0, 4, redPaint)
-        drawLinePairs(canvas, vertices, 1, 5, redPaint)
-        drawLinePairs(canvas, vertices, 2, 6, redPaint)
-        drawLinePairs(canvas, vertices, 3, 7, redPaint)
+    fun drawCube(canvas: Canvas, vertices: Array<Coordinate>, color : Int)  {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.style = Paint.Style.STROKE //Stroke
+        paint.color = color
+        paint.strokeWidth = 2f
+        drawCube(canvas, vertices, paint)
+    }
+
+    fun drawCube(canvas: Canvas, vertices: Array<Coordinate>, paint : Paint = redPaint) { //draw a cube on the screen
+        drawLinePairs(canvas, vertices, 0, 1, paint)
+        drawLinePairs(canvas, vertices, 1, 3, paint)
+        drawLinePairs(canvas, vertices, 3, 2, paint)
+        drawLinePairs(canvas, vertices, 2, 0, paint)
+        drawLinePairs(canvas, vertices, 4, 5, paint)
+        drawLinePairs(canvas, vertices, 5, 7, paint)
+        drawLinePairs(canvas, vertices, 7, 6, paint)
+        drawLinePairs(canvas, vertices, 6, 4, paint)
+        drawLinePairs(canvas, vertices, 0, 4, paint)
+        drawLinePairs(canvas, vertices, 1, 5, paint)
+        drawLinePairs(canvas, vertices, 2, 6, paint)
+        drawLinePairs(canvas, vertices, 3, 7, paint)
+    }
+
+    fun drawText(canvas: Canvas, text: String) {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        redPaint.style = Paint.Style.FILL //Stroke
+        redPaint.color = Color.RED
+        redPaint.strokeWidth = 1f
+        redPaint.textSize = 50f
+
+        canvas.drawText(text, 50f, 50f, redPaint)
     }
 }
