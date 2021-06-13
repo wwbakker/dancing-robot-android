@@ -42,8 +42,10 @@ object Robot {
     val transformations = listOf(
         ScaleTransformation(),
         LegAnimation(),
+        ArmAnimation(),
         MoveLimbToPositionInBodyTransformation(),
         ViewAngleAnimation(),
+//        DebugSideView(),
         CenterOnScreenTransformation()
     )
 
