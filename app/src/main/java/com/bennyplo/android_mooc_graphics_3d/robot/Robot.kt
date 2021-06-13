@@ -7,33 +7,37 @@ import com.bennyplo.android_mooc_graphics_3d.robot.LimbType.*
 import com.bennyplo.android_mooc_graphics_3d.robot.transformations.*
 
 object Robot {
+    val scalingFactor = 0.60
     val offsetZ = 0.0
-    val offsetY = 150.0
-    val headSize = 240.0
+    val offsetY = 150.0 * scalingFactor
+    val headSize = 240.0 * scalingFactor
     val headY = offsetY + (headSize / 2.0)
-    val neckHeight = 60.0
+    val neckHeight = 60.0 * scalingFactor
     val neckY = headY + (headSize / 2.0) + (neckHeight / 2.0)
-    val bodyHeight = 600.0
+    val bodyDepth = 120 * scalingFactor
+    val bodyHeight = 600.0 * scalingFactor
+    val bodyWidth = 480.0 * scalingFactor
     val bodyY = neckY + (neckHeight / 2.0) + (bodyHeight / 2.0)
-    val waistHeight =  160.0
+    val waistHeight =  160.0 * scalingFactor
     val waistY = bodyY + (bodyHeight / 2.0) + (waistHeight / 2.0)
 
-    val upperArmHeight = 240.0
+    val limbWidth = 160.0 * scalingFactor
+    val upperArmHeight = 240.0 * scalingFactor
     val upperArmY = bodyY - (bodyHeight / 2.0) + (upperArmHeight / 2.0)
-    val lowerArmHeight = 320.0
+    val lowerArmHeight = 320.0 * scalingFactor
     val lowerArmY = upperArmY + (upperArmHeight / 2.0) + (lowerArmHeight / 2.0)
-    val handHeight = 80.0
+    val handHeight = 80.0 * scalingFactor
+    val handAndFootDepth = limbWidth + (100.0 * scalingFactor)
     val handY = lowerArmY + (lowerArmHeight / 2.0) + (handHeight / 2.0)
 
-    val upperLegHeight = 240.0
+    val upperLegHeight = 240.0 * scalingFactor
     val upperLegY = waistY + (waistHeight / 2.0) + (upperLegHeight / 2.0)
-    val lowerLegHeight = 320.0
+    val lowerLegHeight = 320.0 * scalingFactor
     val lowerLegY = upperLegY + (upperLegHeight / 2.0) + (lowerLegHeight / 2.0)
-    val footHeight = 80.0
+    val footHeight = 80.0 * scalingFactor
     val footY = lowerLegY + (lowerLegHeight / 2.0) + (footHeight / 2.0)
 
-    val bodyWidth = 480.0
-    val limbWidth = 160.0
+
     val leftArmX = - (bodyWidth / 2.0) - (limbWidth / 2.0)
     val rightArmX = + (bodyWidth / 2.0) + (limbWidth / 2.0)
     val leftLegX = - (bodyWidth / 2.0) + (limbWidth / 2.0)

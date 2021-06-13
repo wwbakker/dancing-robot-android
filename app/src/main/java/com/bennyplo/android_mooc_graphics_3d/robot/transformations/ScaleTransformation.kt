@@ -12,20 +12,20 @@ class ScaleTransformation : Transformation {
         return when (limbType) {
             Head -> limb.scale(Robot.headSize, Robot.headSize, Robot.headSize)
             Neck -> limb.scale(Robot.neckHeight * 2.0, Robot.neckHeight, Robot.neckHeight * 2.0)
-            Body -> limb.scale(Robot.bodyWidth, Robot.bodyHeight, 120.0)
-            Waist -> limb.scale(Robot.bodyWidth, Robot.waistHeight, 120.0)
+            Body -> limb.scale(Robot.bodyWidth, Robot.bodyHeight, Robot.bodyDepth)
+            Waist -> limb.scale(Robot.bodyWidth, Robot.waistHeight, Robot.bodyDepth)
             UpperLeftArm -> limb.scale(Robot.limbWidth, Robot.upperArmHeight, Robot.limbWidth)
             UpperRightArm -> limb.scale(Robot.limbWidth, Robot.upperArmHeight, Robot.limbWidth)
             LowerLeftArm -> limb.scale(Robot.limbWidth, Robot.lowerArmHeight, Robot.limbWidth)
             LowerRightArm -> limb.scale(Robot.limbWidth, Robot.lowerArmHeight, Robot.limbWidth)
-            LeftHand -> limb.scale(Robot.limbWidth, Robot.handHeight, Robot.limbWidth + 100.0)
-            RightHand -> limb.scale(Robot.limbWidth, Robot.handHeight, Robot.limbWidth + 100.0)
+            LeftHand -> limb.scale(Robot.limbWidth, Robot.handHeight, Robot.handAndFootDepth)
+            RightHand -> limb.scale(Robot.limbWidth, Robot.handHeight, Robot.handAndFootDepth)
             UpperLeftLeg -> limb.scale(Robot.limbWidth, Robot.upperLegHeight, Robot.limbWidth)
             UpperRightLeg -> limb.scale(Robot.limbWidth, Robot.upperLegHeight, Robot.limbWidth)
             LowerLeftLeg -> limb.scale(Robot.limbWidth, Robot.lowerLegHeight, Robot.limbWidth)
             LowerRightLeg -> limb.scale(Robot.limbWidth, Robot.lowerLegHeight, Robot.limbWidth)
-            LeftFoot -> limb.scale(Robot.limbWidth, Robot.footHeight, Robot.limbWidth + 100.0)
-            RightFoot -> limb.scale(Robot.limbWidth, Robot.footHeight, Robot.limbWidth + 100.0)
+            LeftFoot -> limb.scale(Robot.limbWidth, Robot.footHeight, Robot.handAndFootDepth)
+            RightFoot -> limb.scale(Robot.limbWidth, Robot.footHeight, Robot.handAndFootDepth)
         }
     }
 }
