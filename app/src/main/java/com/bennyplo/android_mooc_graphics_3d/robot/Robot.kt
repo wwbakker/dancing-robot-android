@@ -66,8 +66,12 @@ object Robot {
         val cube = DrawHelper.cube_vertices
         values().map { limbType ->
             Pair(transformations.fold(cube) { limb, transformation -> transformation.transform(limbType, limb) }, limbType)
-        }.forEach { limbAndLimbType ->
-            DrawHelper.drawCube(canvas, limbAndLimbType.first, limbToColor(limbAndLimbType.second))
+        }
+            // sort by z value, so that the limbs with the limbs that are the closest are drawn last
+            // look specifically at the closest 4 vertices (probably the closest face)
+            .sortedBy { it.first.map { c -> c.z }.sorted().takeLast(4).sum() }
+            .forEach { limbAndLimbType ->
+            DrawHelper.drawAndFillCube(canvas, limbAndLimbType.first, limbToColor(limbAndLimbType.second))
         }
     }
 

@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 
 object DrawHelper {
 
@@ -32,26 +33,7 @@ object DrawHelper {
         bluePaint.strokeWidth = 2f
     }
 
-    private fun drawLinePairs(
-        canvas: Canvas,
-        vertices: Array<Coordinate>,
-        start: Int,
-        end: Int,
-        paint: Paint
-    ) { //draw a line connecting 2 points
-        //canvas - canvas of the view
-        //points - array of points
-        //start - index of the starting point
-        //end - index of the ending point
-        //paint - the paint of the line
-        canvas.drawLine(
-            vertices[start].x.toFloat(),
-            vertices[start].y.toFloat(),
-            vertices[end].x.toFloat(),
-            vertices[end].y.toFloat(),
-            paint
-        )
-    }
+
 
     fun drawHeightLine(canvas: Canvas, y : Double, screenWidth: Double) {
         canvas.drawLine(
@@ -84,6 +66,57 @@ object DrawHelper {
         drawLinePairs(canvas, vertices, 1, 5, paint)
         drawLinePairs(canvas, vertices, 2, 6, paint)
         drawLinePairs(canvas, vertices, 3, 7, paint)
+    }
+
+    private fun drawLinePairs(
+        canvas: Canvas,
+        vertices: Array<Coordinate>,
+        start: Int,
+        end: Int,
+        paint: Paint
+    ) { //draw a line connecting 2 points
+        //canvas - canvas of the view
+        //points - array of points
+        //start - index of the starting point
+        //end - index of the ending point
+        //paint - the paint of the line
+        canvas.drawLine(
+            vertices[start].x.toFloat(),
+            vertices[start].y.toFloat(),
+            vertices[end].x.toFloat(),
+            vertices[end].y.toFloat(),
+            paint
+        )
+    }
+
+    fun drawAndFillCube(canvas: Canvas, vertices: Array<Coordinate>, color: Int) { //draw a cube on the screen
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.style = Paint.Style.FILL_AND_STROKE //Stroke
+        paint.color = color
+        paint.strokeWidth = 2f
+
+        drawFace(canvas, vertices, paint, 0,1,3,2)
+        drawFace(canvas, vertices, paint, 1,5,7,3)
+        drawFace(canvas, vertices, paint, 4,5,6,7)
+        drawFace(canvas, vertices, paint, 0,4,6,2)
+        drawFace(canvas, vertices, paint, 2,3,7,6)
+        drawFace(canvas, vertices, paint, 0,4,5,1)
+    }
+
+    fun drawFace(canvas: Canvas,
+                 vertices: Array<Coordinate>,
+                 paint: Paint,
+                 v1: Int,
+                 v2: Int,
+                 v3: Int,
+                 v4: Int,
+    ) {
+        val p = Path()
+        p.moveTo(vertices[v1].x.toFloat(), vertices[v1].y.toFloat())
+        p.lineTo(vertices[v2].x.toFloat(), vertices[v2].y.toFloat())
+        p.lineTo(vertices[v3].x.toFloat(), vertices[v3].y.toFloat())
+        p.lineTo(vertices[v4].x.toFloat(), vertices[v4].y.toFloat())
+        canvas.drawPath(p, paint)
     }
 
     fun drawText(canvas: Canvas, text: String) {
