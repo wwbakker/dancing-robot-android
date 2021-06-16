@@ -3,6 +3,7 @@ package com.bennyplo.android_mooc_graphics_3d.robot.transformations
 import com.bennyplo.android_mooc_graphics_3d.Coordinate
 import com.bennyplo.android_mooc_graphics_3d.quaternionRotationFromEulerAngles
 import com.bennyplo.android_mooc_graphics_3d.robot.Animation
+import com.bennyplo.android_mooc_graphics_3d.robot.AnimationHelper
 import com.bennyplo.android_mooc_graphics_3d.robot.LimbType
 import com.bennyplo.android_mooc_graphics_3d.robot.LimbType.*
 import com.bennyplo.android_mooc_graphics_3d.robot.Robot
@@ -12,27 +13,24 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class LegAnimation(var legAngleInDegrees : Double = 0.0,
-                   var leftLeg: Boolean = true,
-                   private var increaseLegAngle : Boolean = true) : Animation {
-    override fun update() {
-        // LegAngle
-        when {
-            legAngleInDegrees > 60.0  -> increaseLegAngle = false
-            legAngleInDegrees < 0 -> {
-                increaseLegAngle = true
-                leftLeg = !leftLeg
-            }
-        }
-        legAngleInDegrees = if (increaseLegAngle) legAngleInDegrees + 0.45 else legAngleInDegrees - 0.45
+class LegAnimation(private var counter : Long = 0L) : Animation {
+
+    override fun update(counter : Long) {
+        this.counter = counter % 6000L
     }
 
-    private val liftedLimbs : Set<LimbType>
-        get() = if(leftLeg) setOf(UpperLeftLeg, LowerLeftLeg, LeftFoot) else setOf(UpperRightLeg, LowerRightLeg, RightFoot)
+    private val enabled : Boolean
+        get() = counter < 4000L
 
+
+    private val legAngleInDegrees : Double
+        get() = AnimationHelper.interpolateBackAndForth(counter, 1000L, 60.0)
+
+    private val liftedLimbs : Set<LimbType>
+        get() = if(counter % 2000L > 1000) setOf(UpperLeftLeg, LowerLeftLeg, LeftFoot) else setOf(UpperRightLeg, LowerRightLeg, RightFoot)
 
     override fun transform(limbType: LimbType, limb: Array<Coordinate>): Array<Coordinate> {
-        if (!liftedLimbs.contains(limbType)) {
+        if (!liftedLimbs.contains(limbType) || !enabled) {
             return limb
         }
 

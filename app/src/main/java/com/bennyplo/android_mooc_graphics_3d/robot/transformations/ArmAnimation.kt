@@ -3,31 +3,33 @@ package com.bennyplo.android_mooc_graphics_3d.robot.transformations
 import com.bennyplo.android_mooc_graphics_3d.Coordinate
 import com.bennyplo.android_mooc_graphics_3d.quaternionRotationFromEulerAngles
 import com.bennyplo.android_mooc_graphics_3d.robot.Animation
+import com.bennyplo.android_mooc_graphics_3d.robot.AnimationHelper.interpolateBackAndForth
 import com.bennyplo.android_mooc_graphics_3d.robot.LimbType
 import com.bennyplo.android_mooc_graphics_3d.robot.LimbType.*
 import com.bennyplo.android_mooc_graphics_3d.robot.Robot
 import com.bennyplo.android_mooc_graphics_3d.translate
 import com.bennyplo.android_mooc_graphics_3d.withOffset
+import java.lang.IllegalStateException
 import kotlin.math.cos
 import kotlin.math.sin
 
 
-class ArmAnimation(private var increaseArmAngle : Boolean = true,
-                   private var counter : Long = 0L) : Animation {
+class ArmAnimation(private var counter : Long = 0L) : Animation {
 
     enum class Phase {
         Forward,
         Side,
-        Both
+        BothLeft,
+        BothRight
     }
 
     private val phase : Phase
         get() =
-//            Phase.Forward
             when {
                 counter < 2000L -> Phase.Forward
                 counter < 4000L -> Phase.Side
-                else -> Phase.Both
+                counter < 5000L -> Phase.BothLeft
+                else -> Phase.BothRight
             }
 
     private val armAngleInDegrees : Double
@@ -37,24 +39,15 @@ class ArmAnimation(private var increaseArmAngle : Boolean = true,
                     interpolateBackAndForth(counter, 1000L, 45.0)
                 Phase.Side ->
                     interpolateBackAndForth(counter, 1000L, 60.0)
-                Phase.Both ->
+                Phase.BothLeft ->
+                    interpolateBackAndForth(counter, 1000L, 45.0)
+                Phase.BothRight ->
                     interpolateBackAndForth(counter, 1000L, 45.0)
             }
 
 
-
-    private fun interpolateBackAndForth(currentFrame: Long, totalLength: Long, maxValue : Double) : Double {
-        val frame = currentFrame % totalLength
-        val oneWayLength = totalLength / 2L
-        val oneWayFrame = currentFrame % oneWayLength
-        return if (frame < oneWayLength)
-            oneWayFrame * maxValue / oneWayLength
-        else
-            maxValue - (oneWayFrame * maxValue / oneWayLength)
-    }
-
-    override fun update() {
-        counter = System.currentTimeMillis() % 6000
+    override fun update(counter : Long) {
+        this.counter = counter % 6000L
     }
 
     private val liftedLimbs : Set<LimbType>
@@ -65,7 +58,7 @@ class ArmAnimation(private var increaseArmAngle : Boolean = true,
                         setOf(UpperLeftArm, LowerLeftArm, LeftHand)
                     else
                         setOf(UpperRightArm, LowerRightArm, RightHand)
-                Phase.Both ->
+                Phase.BothLeft, Phase.BothRight ->
                     setOf(UpperLeftArm, LowerLeftArm, LeftHand, UpperRightArm, LowerRightArm, RightHand)
             }
 
@@ -79,7 +72,9 @@ class ArmAnimation(private var increaseArmAngle : Boolean = true,
                 transformForward(limbType, limb)
             Phase.Side ->
                 transformSide(limbType, limb)
-            Phase.Both ->
+            Phase.BothLeft ->
+                transformSide(limbType, transformForward(limbType, limb))
+            Phase.BothRight ->
                 transformSide(limbType, transformForward(limbType, limb))
         }
     }
@@ -94,43 +89,86 @@ class ArmAnimation(private var increaseArmAngle : Boolean = true,
             (cos(Math.toRadians(armAngleInDegrees * 2.0)) * Robot.lowerArmHeight) - Robot.lowerArmHeight
         val lowerArmRotationXOffset = - (sin(Math.toRadians(armAngleInDegrees * 2.0)) * Robot.lowerArmHeight)
 
-        return when (limbType) {
-            UpperLeftArm ->
-                limb.withOffset(
-                    -Robot.limbWidth / 2.0,
-                    Robot.upperArmHeight / 2.0,
-                    -Robot.limbWidth / 2.0
-                ) {
-                    it.quaternionRotationFromEulerAngles(armAngleInDegrees, 0.0, 0.0, 1.0)
-                }
-            UpperRightArm ->
-                limb.withOffset(
-                    Robot.limbWidth / 2.0,
-                    Robot.upperArmHeight / 2.0,
-                    -Robot.limbWidth / 2.0
-                ) {
-                    it.quaternionRotationFromEulerAngles(armAngleInDegrees, 0.0, 0.0, -1.0)
-                }
-            LowerLeftArm ->
-                limb.withOffset(-Robot.limbWidth / 2.0, Robot.lowerArmHeight / 2.0, -Robot.limbWidth / 2.0) {
-                    it.quaternionRotationFromEulerAngles(armAngleInDegrees * 2.0, 0.0, 0.0, 1.0)
-                }.translate(upperArmRotationXOffset, upperArmRotationYOffset, 0.0)
-
-            LowerRightArm ->
-                limb.withOffset(Robot.limbWidth / 2.0, Robot.lowerArmHeight / 2.0, -Robot.limbWidth / 2.0) {
-                    it.quaternionRotationFromEulerAngles(armAngleInDegrees * 2.0, 0.0, 0.0, -1.0)
-                }.translate(-upperArmRotationXOffset, upperArmRotationYOffset, 0.0)
-            LeftHand ->
-                limb.withOffset(-Robot.limbWidth / 2.0, Robot.handHeight / 2.0, -(Robot.handAndFootDepth) / 2.0) {
-                    it.quaternionRotationFromEulerAngles(armAngleInDegrees * 2.0, 0.0, 0.0, 1.0)
-                }.translate(upperArmRotationXOffset + lowerArmRotationXOffset, lowerArmRotationYOffset + upperArmRotationYOffset, 0.0)
-            RightHand ->
-                limb.withOffset(Robot.limbWidth / 2.0, Robot.handHeight / 2.0, -(Robot.handAndFootDepth) / 2.0) {
-                    it.quaternionRotationFromEulerAngles(armAngleInDegrees * 2.0, 0.0, 0.0, -1.0)
-                }.translate(-upperArmRotationXOffset - lowerArmRotationXOffset, lowerArmRotationYOffset + upperArmRotationYOffset, 0.0)
-            else ->
-                limb
+        fun upperArm(left : Boolean) : Array<Coordinate> {
+            return limb.withOffset(
+                if (left) -Robot.limbWidth / 2.0 else Robot.limbWidth / 2.0,
+                Robot.upperArmHeight / 2.0,
+                -Robot.limbWidth / 2.0
+            ) {
+                it.quaternionRotationFromEulerAngles(armAngleInDegrees, 0.0, 0.0, if (left) 1.0 else -1.0)
+            }
         }
+
+        fun lowerArm(left: Boolean) : Array<Coordinate> {
+            return limb.withOffset(if (left) -Robot.limbWidth / 2.0 else Robot.limbWidth / 2.0, Robot.lowerArmHeight / 2.0, -Robot.limbWidth / 2.0) {
+                it.quaternionRotationFromEulerAngles(armAngleInDegrees * 2.0, 0.0, 0.0, if (left) 1.0 else -1.0)
+            }.translate(if (left) upperArmRotationXOffset else -upperArmRotationXOffset, upperArmRotationYOffset, 0.0)
+        }
+        fun hand(left: Boolean) : Array<Coordinate> {
+            return limb.withOffset(if (left) -Robot.limbWidth / 2.0 else Robot.limbWidth / 2.0, Robot.handHeight / 2.0, -(Robot.handAndFootDepth) / 2.0) {
+                it.quaternionRotationFromEulerAngles(armAngleInDegrees * 2.0, 0.0, 0.0, if (left) 1.0 else -1.0)
+            }.translate(if (left) upperArmRotationXOffset + lowerArmRotationXOffset else -upperArmRotationXOffset - lowerArmRotationXOffset, lowerArmRotationYOffset + upperArmRotationYOffset, 0.0)
+        }
+
+        return when(phase) {
+            Phase.Forward -> limb
+            Phase.Side -> {
+                return when (limbType) {
+                    UpperLeftArm ->
+                        upperArm(left = true)
+                    UpperRightArm ->
+                        upperArm(left = false)
+                    LowerLeftArm ->
+                        lowerArm(left = true)
+                    LowerRightArm ->
+                        lowerArm(left = false)
+                    LeftHand ->
+                        hand(left = true)
+                    RightHand ->
+                        hand(left = false)
+                    else ->
+                        limb
+                }
+            }
+            Phase.BothLeft -> {
+                return when (limbType) {
+                    UpperLeftArm ->
+                        upperArm(left = true)
+                    UpperRightArm ->
+                        upperArm(left = true)
+                    LowerLeftArm ->
+                        lowerArm(left = true)
+                    LowerRightArm ->
+                        lowerArm(left = true)
+                    LeftHand ->
+                        hand(left = true)
+                    RightHand ->
+                        hand(left = true)
+                    else ->
+                        limb
+                }
+            }
+            Phase.BothRight -> {
+                return when (limbType) {
+                    UpperLeftArm ->
+                        upperArm(left = false)
+                    UpperRightArm ->
+                        upperArm(left = false)
+                    LowerLeftArm ->
+                        lowerArm(left = false)
+                    LowerRightArm ->
+                        lowerArm(left = false)
+                    LeftHand ->
+                        hand(left = false)
+                    RightHand ->
+                        hand(left = false)
+                    else ->
+                        limb
+                }
+            }
+        }
+
+
     }
 
     fun transformForward(limbType: LimbType, limb: Array<Coordinate>): Array<Coordinate> {

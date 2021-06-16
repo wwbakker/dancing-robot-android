@@ -43,6 +43,8 @@ object Robot {
     val leftLegX = - (bodyWidth / 2.0) + (limbWidth / 2.0)
     val rightLegX = + (bodyWidth / 2.0) - (limbWidth / 2.0)
 
+    val danceSpeedFactor = 2L
+
     val transformations = listOf(
         ScaleTransformation(),
         LegAnimation(),
@@ -56,7 +58,7 @@ object Robot {
     fun update() {
         transformations.forEach { when(it) {
             is Animation ->
-                it.update()
+                it.update(System.currentTimeMillis() * danceSpeedFactor)
         } }
     }
 

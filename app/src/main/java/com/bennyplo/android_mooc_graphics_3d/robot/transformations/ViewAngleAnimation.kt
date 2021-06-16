@@ -9,7 +9,7 @@ class ViewAngleAnimation : Animation {
     var viewAngleInDegrees : Double = 0.0
     private var increaseViewAngle : Boolean = true
 
-    override fun update() {
+    override fun update(counter : Long) {
         // ViewAngle
         when {
             viewAngleInDegrees > 45.0  -> increaseViewAngle = false
