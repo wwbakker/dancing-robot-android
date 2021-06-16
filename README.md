@@ -1,2 +1,6 @@
-# Advanced-Android-MOOC-Graphics-3D
-This is an empty project for Advanced Android MOOC course - designing and creating 3D graphics with canvas
+# Dancing robot
+This is the source code of the assignment for the following course:
+
+https://www.coursera.org/learn/intro-android-graphics
+
+![alt text](example.gif)

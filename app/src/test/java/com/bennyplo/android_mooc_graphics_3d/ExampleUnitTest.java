@@ -1,4 +1,4 @@
-package com.bennyplo.android_mooc_graphics_3d;
+package nl.wwbakker.dancingrobot;
 
 import org.junit.Test;
 
