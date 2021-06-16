@@ -209,8 +209,3 @@ fun Array<Coordinate>.perspectiveProjectionDepthScale(near : Double, far : Doubl
     return Matrix.transformation(this, matrix)
 }
 
-private val screenCenterX = Resources.getSystem().displayMetrics.widthPixels / 2.0
-
-fun Array<Coordinate>.centerXOnScreen() : Array<Coordinate> {
-    return this.translate(screenCenterX, 0.0, 0.0)
-}

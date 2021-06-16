@@ -9,7 +9,7 @@ import com.bennyplo.android_mooc_graphics_3d.robot.transformations.*
 object Robot {
     val scalingFactor = 0.60
     val offsetZ = 0.0
-    val offsetY = 150.0 * scalingFactor
+    val offsetY = 0.0 * scalingFactor
     val headSize = 240.0 * scalingFactor
     val headY = offsetY + (headSize / 2.0)
     val neckHeight = 60.0 * scalingFactor
@@ -42,6 +42,8 @@ object Robot {
     val rightArmX = + (bodyWidth / 2.0) + (limbWidth / 2.0)
     val leftLegX = - (bodyWidth / 2.0) + (limbWidth / 2.0)
     val rightLegX = + (bodyWidth / 2.0) - (limbWidth / 2.0)
+
+    val totalHeight = (headY + neckY + bodyY + upperLegY + lowerLegY + footY) * scalingFactor
 
     val danceSpeedFactor = 2L
 
